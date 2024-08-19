@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nice_Admin_1", "Nice_Admin_1.csproj", "{449951F1-5E8B-4A1F-BD3C-307E8163A315}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{449951F1-5E8B-4A1F-BD3C-307E8163A315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{449951F1-5E8B-4A1F-BD3C-307E8163A315}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{449951F1-5E8B-4A1F-BD3C-307E8163A315}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{449951F1-5E8B-4A1F-BD3C-307E8163A315}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4B648056-032A-451A-92B4-8ECCD4812B23}
+	EndGlobalSection
+EndGlobal
