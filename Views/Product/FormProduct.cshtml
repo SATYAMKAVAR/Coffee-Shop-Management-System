@@ -1,7 +1,7 @@
 ﻿
 @model Nice_Admin_1.Models.ProductModel
 <div class="pagetitle">
-    <h1>Form Product</h1>
+    <h1>@(Model.ProductID > 0 ? "Edit " : "Add ")Product</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
@@ -21,27 +21,27 @@
                         <div asp-validation-summaray="ModelOnly"></div>
                         
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Product Name</label>
+                            <label for="inputNanme4" class="form-label">Product Name <span class="text-danger">*</span></label>
                             <input type="text" asp-for="ProductName" class="form-control" id="inputNanme4">
                             <span asp-validation-for="ProductName" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Product Price</label>
+                            <label for="inputNanme4" class="form-label">Product Price <span class="text-danger">*</span></label>
                             <input type="number" asp-for="ProductPrice" class="form-control" id="inputNanme4">
                             <span asp-validation-for="ProductPrice" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Product Code</label>
+                            <label for="inputNanme4" class="form-label">Product Code <span class="text-danger">*</span></label>
                             <input type="text" asp-for="ProductCode" class="form-control" id="inputNanme4">
                             <span asp-validation-for="ProductCode" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Description</label>
+                            <label for="inputNanme4" class="form-label">Description <span class="text-danger">*</span></label>
                             <input type="text" asp-for="Description" class="form-control" id="inputNanme4">
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">User ID</label>
+                            <label for="inputNanme4" class="form-label">User Name <span class="text-danger">*</span></label>
                             <select id="inputState" class="form-select" asp-for="UserID" aria-label="Default select example" asp-items="@ViewBag.UserList">
                                 <option value="">Select an option</option>
                             </select>

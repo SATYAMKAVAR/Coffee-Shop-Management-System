@@ -1,6 +1,6 @@
 ﻿@model Nice_Admin_1.Models.OrderModel
 <div class="pagetitle">
-    <h1>Form Order</h1>
+    <h1>@(Model.OrderID > 0 ? "Edit " : "Add ")Order</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
@@ -19,7 +19,12 @@
                         <div asp-validation-summary="ModelOnly"></div>
 
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Order Date</label>
+                            <label for="inputNanme4" class="form-label">Order Number <span class="text-danger">*</span></label>
+                            <input type="Number" class="form-control" id="inputNanme4" asp-for="OrderNumber">
+                            <span asp-validation-for="OrderNumber" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <label for="inputNanme4" class="form-label">Order Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="inputNanme4" asp-for="OrderDate">
                             <span asp-validation-for="OrderDate" class="text-danger"></span>
                         </div>
@@ -34,19 +39,19 @@
                             <span asp-validation-for="TotalAmount" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Shipping Address</label>
-                            <input type="text" class="form-control" id="inputNanme4" asp-for="ShippingAddress">
+                            <label for="inputNanme4" class="form-label">Shipping Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="inputNanme4" asp-for="ShippingAddress"></textarea>
                             <span asp-validation-for="ShippingAddress" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Customer ID</label>
+                            <label for="inputNanme4" class="form-label">Customer Name <span class="text-danger">*</span></label>
                             <select id="inputState" class="form-select" asp-for="CustomerID" aria-label="Default select example" asp-items="@ViewBag.CustomerList">
                                 <option value="" disabled selected>Select an option</option>
                             </select>
                             <span asp-validation-for="CustomerID" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">User ID</label>
+                            <label for="inputNanme4" class="form-label">User Name <span class="text-danger">*</span></label>
                             <select id="inputState" class="form-select" asp-for="UserID" aria-label="Default select example" asp-items="@ViewBag.UserList">
                                 <option value="" disabled selected>Select an option</option>
                             </select>

@@ -1,7 +1,7 @@
 ﻿@model Nice_Admin_1.Models.UserModel
 
 <div class="pagetitle">
-    <h1>Form User</h1>
+    <h1>@(Model.UserID > 0 ? "Edit " : "Add ")User</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
@@ -16,34 +16,34 @@
 
             <div class="card">
                 <div class="card-body">
-                    <form class="row g-3 pb-3" asp-action="Usersave">
+                    <form class="row g-3 py-3" asp-action="Usersave">
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">User Name</label>
+                            <label for="inputNanme4" class="form-label">User Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="inputNanme4" asp-for="UserName">
                             <span asp-validation-for="UserName" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Email</label>
+                            <label for="inputNanme4" class="form-label">Email <span class="text-danger">*</span></label>
                             <input type="email" class="form-control" id="inputNanme4" asp-for="Email">
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Password</label>
+                            <label for="inputNanme4" class="form-label">Password <span class="text-danger">*</span></label>
                             <input type="password" class="form-control" id="inputNanme4" asp-for="Password">
                             <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Mobile No.</label>
+                            <label for="inputNanme4" class="form-label">Mobile No. <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="inputNanme4" asp-for="MobileNo">
                             <span asp-validation-for="MobileNo" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Address</label>
+                            <label for="inputNanme4" class="form-label">Address <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="inputNanme4" asp-for="Address">
                             <span asp-validation-for="Address" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Is Active</label>
+                            <label for="inputNanme4" class="form-label">Is Active <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="inputNanme4" asp-for="IsActive">
                             <span asp-validation-for="IsActive" class="text-danger"></span>
                         </div>

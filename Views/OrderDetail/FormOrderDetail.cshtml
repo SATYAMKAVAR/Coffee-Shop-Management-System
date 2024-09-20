@@ -1,6 +1,6 @@
 ﻿@model Nice_Admin_1.Models.OrderDetailModel
 <div class="pagetitle">
-    <h1>Form Order Detail</h1>
+    <h1>@(Model.OrderDetailID > 0 ? "Edit " : "Add ")Order Detail</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
@@ -14,46 +14,45 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <form class="row g-3 pb-3" asp-action="OrderDetailSave">
+                    <form class="row g-3 py-3" asp-action="OrderDetailSave">
                         @Html.HiddenFor(x => x.OrderDetailID)
                         <div asp-validation-summary="ModelOnly"></div>
-
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Quantiity</label>
+                            <label for="UserID" class="form-label">User Name <span class="text-danger">*</span> </label>
+                            <select name="UserID" id="UserID" class="form-select" asp-for="UserID" aria-label="Default select example" asp-items="@ViewBag.UserList">
+                                <option value="">Select an option</option>
+                            </select>
+                            <span asp-validation-for="UserID" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <label for="OrderID" class="form-label">Order Number <span class="text-danger">*</span> </label>
+                            <select name="OrderID" id="OrderID" class="form-select">
+                                <option value="">Select an option</option>
+                                <!-- Options will be dynamically updated -->
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="inputNanme4" class="form-label">Quantiity <span class="text-danger">*</span> </label>
                             <input type="number" class="form-control" id="inputNanme4" asp-for="Quantity">
                             <span asp-validation-for="Quantity" class="text-danger"></span>
 
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Amount</label>
+                            <label for="inputNanme4" class="form-label">Amount <span class="text-danger">*</span> </label>
                             <input type="number" class="form-control" id="inputNanme4" asp-for="Amount">
                             <span asp-validation-for="Amount" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Total Amount</label>
+                            <label for="inputNanme4" class="form-label">Total Amount <span class="text-danger">*</span> </label>
                             <input type="number" class="form-control" id="inputNanme4" asp-for="TotalAmount">
                             <span asp-validation-for="TotalAmount" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Order ID</label>
-                            <select id="inputState" class="form-select" asp-for="UserID" aria-label="Default select example" asp-items="@ViewBag.OrderList">
-                                <option value="">Select an option</option>
-                            </select>
-                            <span asp-validation-for="UserID" class="text-danger"></span>
-                        </div>
-                        <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Product ID</label>
-                            <select id="inputState" class="form-select" asp-for="UserID" aria-label="Default select example" asp-items="@ViewBag.ProductList">
+                            <label for="inputNanme4" class="form-label">Product Name <span class="text-danger">*</span> </label>
+                            <select id="inputState" class="form-select" asp-for="ProductID" aria-label="Default select example" asp-items="@ViewBag.ProductList">
                                 <option value="">Select an option</option>
                             </select>
                             <span asp-validation-for="ProductID" class="text-danger"></span>
-                        </div>
-                        <div class="col-12">
-                            <label for="inputNanme4" class="form-label">User ID</label>
-                            <select id="inputState" class="form-select" asp-for="UserID" aria-label="Default select example" asp-items="@ViewBag.UserList">
-                                <option value="">Select an option</option>
-                            </select>
-                            <span asp-validation-for="UserID" class="text-danger"></span>
                         </div>
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -66,6 +65,41 @@
         </div>
     </div>
 </section>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#UserID').change(function () {
+            var userId = $(this).val();
+
+            if (userId) {
+                $.ajax({
+                    url: '@Url.Action("GetOrdersByUser", "OrderDetail")',
+                    type: "GET",
+                    data: { userId: userId },
+                    success: function (data) {
+                        // Clear the existing options in OrderID dropdown
+                        $('#OrderID').empty();
+                        $('#OrderID').append('<option value="">Select Order</option>');
+                        // Loop through the returned data
+                        $.each(data, function (index, order) {
+                            // Append options to the Order dropdown
+                            $('#OrderID').append('<option value="' + order.orderID + '">' + order.orderNumber + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            } else {
+                $('#OrderID').empty();
+                $('#OrderID').append('<option value="">Select Order</option>');
+            }
+        });
+    });
+</script>
+
 
 @section Scripts {
     @{

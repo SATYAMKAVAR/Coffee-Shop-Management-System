@@ -1,8 +1,13 @@
 ﻿@model DataTable;
 @using System.Data;
-
+@* @if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+} *@
 <div class="pagetitle">
-    <h1>Bills Table</h1>
+    <h1>Bills</h1>
 </div><!-- End Page Title -->
 
 <section class="section">
@@ -11,22 +16,20 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Datatables</h5>
-                    <p>Add lightweight datatables to your project with using the <a href="https://github.com/fiduswriter/Simple-DataTables" target="_blank">Simple DataTables</a> library. Just add <code>.datatable</code> class name to any table you wish to conver to a datatable. Check for <a href="https://fiduswriter.github.io/simple-datatables/demos/" target="_blank">more examples</a>.</p>
+                    @* <p>Add lightweight datatables to your project with using the <a href="https://github.com/fiduswriter/Simple-DataTables" target="_blank">Simple DataTables</a> library. Just add <code>.datatable</code> class name to any table you wish to conver to a datatable. Check for <a href="https://fiduswriter.github.io/simple-datatables/demos/" target="_blank">more examples</a>.</p> *@
                     <a asp-controller="Bills" asp-action="FormBills">
                         <button class="btn btn-primary float-end m-2">Add</button>
                     </a> 
                     <table class="table datatable">
                         <thead>
                             <tr>
-                                <th>Bill ID</th>
                                 <th>Bill Number</th>
                                 <th>Bill Date</th>
-                                <th>Order ID</th>
+                                <th>Order Number</th>
                                 <th>Total Amount</th>
                                 <th>Discount</th>
                                 <th>Net Amount</th>
-                                <th>User ID</th>
+                                <th>User Name</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -34,27 +37,46 @@
                             @foreach (DataRow b in Model.Rows)
                             {
                                 <tr>
-                                    <td>@b["BillID"]</td>
                                     <td>@b["BillNumber"]</td>
                                     <td>@b["BillDate"]</td>
-                                    <td>@b["OrderID"]</td>
+                                    <td>@b["OrderNumber"]</td>
                                     <td>@b["TotalAmount"]</td>
                                     <td>@b["Discount"]</td>
                                     <td>@b["NetAmount"]</td>
-                                    <td>@b["UserID"]</td>
+                                    <td>@b["UserName"]</td>
                                     <td>
                                         <a class="btn btn-success" asp-controller="Bills" asp-action="FormBills" asp-route-BillID="@b["BillId"]">Edit</a>
-                                        <a class="btn btn-danger" asp-controller="Bills" asp-action="BillDelete" asp-route-BillID="@b["BillID"]">Delete</a>
+                                        <a class="btn btn-danger" asp-controller="Bills" asp-action="BillDelete" asp-route-BillID="@b["BillID"]" onclick="return confirmDelete();">Delete</a>
                                     </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                     <!-- End Table with stripped rows -->
-
                 </div>
             </div>
         </div>
     </div>
 </section>
+<script>
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this bill?');
+    }
+</script>   
+@* <script type="text/javascript">
+    $(document).ready(function () {
+        var message = '@TempData["Message"]';
+        var messageType = '@TempData["MessageType"]';
 
+        if (message) {
+            toastr[messageType](message); // 'success', 'info', 'warning', 'error'
+        }
+    });
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right", // Can be changed to 'toast-bottom-left', etc.
+        "timeOut": "3000" // Time in ms before auto-dismiss
+    };
+</script>
+ *@

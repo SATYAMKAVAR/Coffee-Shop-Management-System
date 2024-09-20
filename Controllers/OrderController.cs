@@ -8,14 +8,25 @@ namespace Nice_Admin_1.Controllers
 {
     public class OrderController : Controller
     {
+        #region Configuration
         private IConfiguration _configuration;
         public OrderController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
+        #endregion
 
+        #region Display Order
         public IActionResult DisplayOrder()
         {
+            if (TempData.ContainsKey("ErrorMessage"))
+            {
+                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
+            }
+            else
+            {
+                ViewBag.ErrorMessage = null; // Or you can omit this step
+            }
             string connectionString = this._configuration.GetConnectionString("ConnectionString");
             SqlConnection connection = new SqlConnection(connectionString);
             connection.Open();
@@ -27,17 +38,44 @@ namespace Nice_Admin_1.Controllers
             table.Load(reader);
             return View(table);
         }
+        #endregion
+        
+        #region Order Delete
         public IActionResult OrderDelete(int OrderID) {
-            string connectionString = this._configuration.GetConnectionString("ConnectionString");
-            SqlConnection connection = new SqlConnection( connectionString);
-            connection.Open();
-            SqlCommand command = connection.CreateCommand();
-            command.CommandType = CommandType.StoredProcedure;
-            command.CommandText = "PR_Order_DeleteByPK";
-            command.Parameters.Add("@OrderID",SqlDbType.Int).Value = OrderID;
-            command.ExecuteNonQuery();
+            try
+            {
+                string connectionString = this._configuration.GetConnectionString("ConnectionString");
+                SqlConnection connection = new SqlConnection(connectionString);
+                connection.Open();
+                SqlCommand command = connection.CreateCommand();
+                command.CommandType = CommandType.StoredProcedure;
+                command.CommandText = "PR_Order_DeleteByPK";
+                command.Parameters.Add("@OrderID", SqlDbType.Int).Value = OrderID;
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                // Check if it's a foreign key constraint violation error
+                if (ex.Number == 547) // 547 is the SQL Server error code for FK violation
+                {
+                    TempData["ErrorMessage"] = "Unable to delete product as it is referenced in another table.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = ex.Message;
+                }
+                Console.WriteLine(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
             return RedirectToAction("DisplayOrder");
         }
+        #endregion
+        
+        #region Form Order
         public IActionResult FormOrder(int OrderID)
         {
             string connectionString = this._configuration.GetConnectionString("ConnectionString");
@@ -85,15 +123,20 @@ namespace Nice_Admin_1.Controllers
             OrderModel orderModel = new OrderModel();
             foreach (DataRow dataRow in dataTable2.Rows)
             {
+                orderModel.OrderID = Convert.ToInt32(dataRow["OrderID"]);
                 orderModel.OrderDate = DateTime.Parse(dataRow["OrderDate"].ToString());
+                orderModel.OrderNumber = Convert.ToInt32(dataRow["OrderNumber"]);
                 orderModel.CustomerID = Convert.ToInt32(dataRow["CustomerID"]);
-                orderModel.PaymentMode = dataRow["PaymentMode"].ToString();
-                orderModel.TotalAmount = Convert.ToDouble(dataRow["TotalAmount"]);
+                orderModel.PaymentMode = dataRow["PaymentMode"] == DBNull.Value ? (String?)null : dataRow["PaymentMode"].ToString();
+                orderModel.TotalAmount = dataRow["TotalAmount"] == DBNull.Value ? (double?)null : Convert.ToDouble(dataRow["TotalAmount"]);
                 orderModel.ShippingAddress = dataRow["ShippingAddress"].ToString();
                 orderModel.UserID = Convert.ToInt32(dataRow["UserID"]);
             }
             return View("FormOrder", orderModel);
         }
+        #endregion
+        
+        #region Order Save
         public IActionResult OrderSave(OrderModel orderModel)
         {
             if (orderModel.UserID <= 0)
@@ -118,6 +161,7 @@ namespace Nice_Admin_1.Controllers
                 }
                 command.Parameters.Add("@OrderDate", SqlDbType.DateTime).Value = orderModel.OrderDate;
                 command.Parameters.Add("@CustomerID", SqlDbType.Int).Value = orderModel.CustomerID;
+                command.Parameters.Add("@OrderNumber", SqlDbType.Int).Value = orderModel.OrderNumber;
                 command.Parameters.Add("@PaymentMode", SqlDbType.VarChar).Value = orderModel.PaymentMode;
                 command.Parameters.Add("@TotalAmount", SqlDbType.Decimal).Value = orderModel.TotalAmount;
                 command.Parameters.Add("@ShippingAddress", SqlDbType.VarChar).Value = orderModel.ShippingAddress;
@@ -127,5 +171,6 @@ namespace Nice_Admin_1.Controllers
             }
             return View("FormOrder", orderModel);
         }
+        #endregion
     }
 }

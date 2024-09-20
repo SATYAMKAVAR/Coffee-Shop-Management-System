@@ -1,6 +1,6 @@
 ﻿@model Nice_Admin_1.Models.BillsModel
 <div class="pagetitle">
-    <h1>Form Bills</h1>
+    <h1>@(Model.BillID > 0 ? "Edit " : "Add ")Bill</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
@@ -19,18 +19,18 @@
                         <div asp-validation-summaray="ModelOnly"></div>
 
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Bill Number</label>
+                            <label for="inputNanme4" class="form-label">Bill Number <span class="text-danger">*</span> </label>
                             <input type="text" class="form-control" id="inputNanme4" asp-for="BillNumber">
                             <span asp-validation-for="BillNumber" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Bill Date</label>
-                            <input type="date" class="form-control"  asp-for="BillDate">
+                            <label for="inputNanme4" class="form-label">Bill Date <span class="text-danger">*</span> </label>
+                            <input type="date" class="form-control" placeholder="dd-mm-yyyy" asp-for="BillDate">
                             <span asp-validation-for="BillDate" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Total Amount</label>
-                            <input type="number" class="form-control" id="inputNanme4" asp-for="TotalAmount">
+                            <label for="inputNanme4" class="form-label">Total Amount <span class="text-danger">*</span> </label>
+                            <input type="number" class="form-control" id="inputNanme4" asp-for="TotalAmount" >
                             <span asp-validation-for="TotalAmount" class="text-danger"></span>
                         </div>
                         <div class="col-12">
@@ -39,12 +39,19 @@
                             <span asp-validation-for="Discount" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">Net Amount</label>
+                            <label for="inputNanme4" class="form-label">Net Amount <span class="text-danger">*</span> </label>
                             <input type="number" class="form-control" id="inputNanme4" asp-for="NetAmount">
                             <span asp-validation-for="NetAmount" class="text-danger"></span>
                         </div>
                         <div class="col-12">
-                            <label for="inputNanme4" class="form-label">User ID</label>
+                            <label for="inputNanme4" class="form-label">Order Number <span class="text-danger">*</span> </label>
+                            <select id="inputState" class="form-select" asp-for="OrderID" aria-label="Default select example" asp-items="@ViewBag.OrderList">
+                                <option value="">Select an option</option>
+                            </select>
+                            <span asp-validation-for="UserID" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <label for="inputNanme4" class="form-label">User Name <span class="text-danger">*</span> </label>
                             <select id="inputState" class="form-select" asp-for="UserID" aria-label="Default select example" asp-items="@ViewBag.UserList">
                                 <option value="">Select an option</option>
                             </select>
@@ -61,7 +68,6 @@
         </div>
     </div>
 </section>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

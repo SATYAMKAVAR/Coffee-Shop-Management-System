@@ -6,13 +6,13 @@ namespace Nice_Admin_1.Models
     {
         public int? OrderID { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
-        public DateTime OrderDate { get; set; }
+        public int? OrderNumber { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
-        public int CustomerID { get; set; }
+        public DateTime OrderDate { get; set; } = DateTime.Now;
         [Required(ErrorMessage = "This Field is Required")]
-        public string PaymentMode { get; set; }
-        [Required(ErrorMessage = "This Field is Required")]
-        public double TotalAmount { get; set; }
+        public int? CustomerID { get; set; }
+        public string? PaymentMode { get; set; }
+        public double? TotalAmount { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
         public string ShippingAddress { get; set; }
         [Required(ErrorMessage = "This Field is Required")]

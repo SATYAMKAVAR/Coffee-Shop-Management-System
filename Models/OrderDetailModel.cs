@@ -6,22 +6,22 @@ namespace Nice_Admin_1.Models
     {
         public int? OrderDetailID { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
-        public int OrderID { get; set; }
+        public int? OrderID { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
-        public int ProductID { get; set; }
+        public int? ProductID { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
-        public int Quantity { get; set; }
+        public int? Quantity { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
-        public double Amount { get; set; }
+        public double? Amount { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
-        public double TotalAmount { get; set; }
+        public double? TotalAmount { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
         public int UserID { get; set; }
     }
     public class OrderDropDownModel
     {
         public int OrderID { get; set; }
-        public DateTime OrderDate { get; set; }
+        public int OrderNumber { get; set; }
     }
     public class ProductDropDownModel
     {

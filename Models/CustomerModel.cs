@@ -29,7 +29,7 @@ namespace Nice_Admin_1.Models
         public string PinCode { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
 
-        public double NetAmount { get; set; }
+        public double? NetAmount { get; set; }
         [Required(ErrorMessage = "This Field is Required")]
 
         public int UserID { get; set; }

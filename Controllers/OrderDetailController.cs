@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nice_Admin_1.Models;
+using OfficeOpenXml.Style;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -8,14 +9,25 @@ namespace Nice_Admin_1.Controllers
 {
     public class OrderDetailController : Controller
     {
+        #region Configuration
         private IConfiguration _configuration;
         public OrderDetailController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
-
+        #endregion
+        
+        #region Display Order Detail
         public IActionResult DisplayOrderDetail()
         {
+            if (TempData.ContainsKey("ErrorMessage"))
+            {
+                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
+            }
+            else
+            {
+                ViewBag.ErrorMessage = null; // Or you can omit this step
+            }
             string connectionString = this._configuration.GetConnectionString("ConnectionString");
             SqlConnection connection = new SqlConnection(connectionString);
             connection.Open();
@@ -27,19 +39,46 @@ namespace Nice_Admin_1.Controllers
             table.Load(reader);
             return View(table);
         }
+        #endregion
+        
+        #region Order Detail Delete
         public IActionResult OrderDetailDelete(int OrderDetailid)
         {
-            string connectionString = this._configuration.GetConnectionString("ConnectionString");
-            SqlConnection connection = new SqlConnection( connectionString);
-            connection.Open();
-            SqlCommand command = connection.CreateCommand();
-            command.CommandType = CommandType.StoredProcedure;
-            command.CommandText = "PR_OrderDetail_DeleteByPK";
-            command.Parameters.Add("@OrderDetailID",SqlDbType.Int).Value = OrderDetailid;
-            command.ExecuteNonQuery();
+            try
+            {
+                string connectionString = this._configuration.GetConnectionString("ConnectionString");
+                SqlConnection connection = new SqlConnection(connectionString);
+                connection.Open();
+                SqlCommand command = connection.CreateCommand();
+                command.CommandType = CommandType.StoredProcedure;
+                command.CommandText = "PR_OrderDetail_DeleteByPK";
+                command.Parameters.Add("@OrderDetailID", SqlDbType.Int).Value = OrderDetailid;
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                // Check if it's a foreign key constraint violation error
+                if (ex.Number == 547) // 547 is the SQL Server error code for FK violation
+                {
+                    TempData["ErrorMessage"] = "Unable to delete product as it is referenced in another table.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = ex.Message;
+                }
+                Console.WriteLine(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
             return RedirectToAction("DisplayOrderDetail");
         }
-        public IActionResult FormOrderDetail()
+        #endregion
+        
+        #region Form Order Detail
+        public IActionResult FormOrderDetail(int OrderDetailID)
         {
             string connectionString = this._configuration.GetConnectionString("ConnectionString");
             SqlConnection connection = new SqlConnection(connectionString);
@@ -58,20 +97,8 @@ namespace Nice_Admin_1.Controllers
                 productDropDownModel.ProductName = row["ProductName"].ToString();
                 productList.Add(productDropDownModel);
             }
-            ViewBag.ProductList = new SelectList(productList,"ProductID","ProductName");
-            command.CommandText = "PR_Order_DropDown";
-            SqlDataReader reader1 = command.ExecuteReader();
-            DataTable dataTable1 = new DataTable();
-            dataTable1.Load(reader1);
-            List<OrderDropDownModel> orderList = new List<OrderDropDownModel>();
-            foreach (DataRow row in dataTable1.Rows)
-            {
-                OrderDropDownModel orderDropDownModel = new OrderDropDownModel();
-                orderDropDownModel.OrderID = Convert.ToInt32(row["OrderID"]);
-                orderDropDownModel.OrderDate = DateTime.Parse(row["OrderDate"].ToString());
-                orderList.Add(orderDropDownModel);
-            }
-            ViewBag.OrderList = new SelectList(orderList, "OrderID", "OrderDate");
+            ViewBag.ProductList = new SelectList(productList, "ProductID", "ProductName");
+            //--------------------------------------------------------------------------------------------
             command.CommandText = "PR_User_DropDown";
             SqlDataReader reader2 = command.ExecuteReader();
             DataTable dataTable2 = new DataTable();
@@ -84,8 +111,24 @@ namespace Nice_Admin_1.Controllers
                 UserDropDownModel.UserName = dataRow["UserName"].ToString();
                 userList.Add(UserDropDownModel);
             }
-            ViewBag.UserList = new SelectList(userList,"UserID","UserName");
+            ViewBag.UserList = new SelectList(userList, "UserID", "UserName");
             //----------------------------------------------------------------------------------------------
+            //command.CommandText = "PR_Cascading_Order_DropDown";
+            //OrderDetailModel orderDetailModel = new OrderDetailModel();
+            //command.Parameters.AddWithValue("@UserID", orderDetailModel.UserID);
+            //SqlDataReader reader1 = command.ExecuteReader();
+            //DataTable dataTable1 = new DataTable();
+            //dataTable1.Load(reader1);
+            //List<OrderDropDownModel> orderList = new List<OrderDropDownModel>();
+            //foreach (DataRow row in dataTable1.Rows)
+            //{
+            //    OrderDropDownModel orderDropDownModel = new OrderDropDownModel();
+            //    orderDropDownModel.OrderID = Convert.ToInt32(row["OrderID"]);
+            //    orderDropDownModel.OrderNumber = Convert.ToInt32(row["OrderNumber"]);
+            //    orderList.Add(orderDropDownModel);
+            //}
+            //ViewBag.OrderList = new SelectList(orderList, "OrderID", "OrderNumber");
+            //--------------------------------------------------------------------------------------------
             SqlConnection connection1 = new SqlConnection(connectionString);
             connection1.Open();
             SqlCommand command1 = connection1.CreateCommand();
@@ -99,16 +142,19 @@ namespace Nice_Admin_1.Controllers
             OrderDetailModel OrderDetailModel = new OrderDetailModel();
             foreach (DataRow dataRow in dataTable3.Rows)
             {
-                OrderDetailModel.OrderDetailNumber = dataRow["OrderDetailNumber"].ToString();
-                //OrderDetailModel.OrderDetailDate = dataRow["OrderDetailCode"].ToString();
+                OrderDetailModel.OrderDetailID = Convert.ToInt32(dataRow["OrderDetailID"]);
                 OrderDetailModel.OrderID = Convert.ToInt32(dataRow["OrderID"]);
+                OrderDetailModel.ProductID = Convert.ToInt32(dataRow["ProductID"]);
+                OrderDetailModel.Quantity = Convert.ToInt32(dataRow["Quantity"]);
+                OrderDetailModel.Amount = Convert.ToDouble(dataRow["Amount"]);
                 OrderDetailModel.TotalAmount = Convert.ToDouble(dataRow["TotalAmount"]);
-                OrderDetailModel.Discount = Convert.ToDouble(dataRow["Discount"]);
-                OrderDetailModel.NetAmount = Convert.ToDouble(dataRow["NetAmount"]);
                 OrderDetailModel.UserID = Convert.ToInt32(dataRow["UserID"]);
             }
-            return View();
+            return View("FormOrderDetail", OrderDetailModel);
         }
+        #endregion
+        
+        #region Order Detail Save
         public IActionResult OrderDetailSave(OrderDetailModel orderDetailModel)
         {
             if (orderDetailModel.UserID <= 0)
@@ -142,5 +188,38 @@ namespace Nice_Admin_1.Controllers
             }
             return View("FormOrderDetail", orderDetailModel);
         }
+        #endregion
+
+        #region GtOrderByUser
+        public IActionResult GetOrdersByUser(int userId)
+        {
+            string connectionString = this._configuration.GetConnectionString("ConnectionString");
+            SqlConnection connection = new SqlConnection(connectionString);
+            connection.Open();
+
+            SqlCommand command = connection.CreateCommand();
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandText = "PR_Cascading_Order_DropDown";
+            command.Parameters.AddWithValue("@UserID", userId);
+
+            SqlDataReader reader = command.ExecuteReader();
+            DataTable dataTable = new DataTable();
+            dataTable.Load(reader);
+
+            List<OrderDropDownModel> orderList = new List<OrderDropDownModel>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                OrderDropDownModel order = new OrderDropDownModel
+                {
+                    OrderID = Convert.ToInt32(row["OrderID"]),
+                    OrderNumber = Convert.ToInt32(row["OrderNumber"])
+                };
+                orderList.Add(order);
+            }
+            //ViewBag.OrderList = new SelectList(orderList, "OrderID", "OrderNumber");
+            return Json(orderList); // Return the list as JSON
+        }
+
+        #endregion
     }
 }

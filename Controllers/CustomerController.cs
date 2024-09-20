@@ -8,13 +8,25 @@ namespace Nice_Admin_1.Controllers
 {
     public class CustomerController : Controller
     {
+        #region Configuration
         private IConfiguration _configuration;
         public CustomerController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
+        #endregion
+
+        #region Display Customer
         public IActionResult DisplayCustomer()
         {
+            if (TempData.ContainsKey("ErrorMessage"))
+            {
+                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
+            }
+            else
+            {
+                ViewBag.ErrorMessage = null; // Or you can omit this step
+            }
             string connectionString = this._configuration.GetConnectionString("ConnectionString");
             SqlConnection connection = new SqlConnection(connectionString);
             connection.Open();
@@ -26,18 +38,45 @@ namespace Nice_Admin_1.Controllers
             table.Load(reader);
             return View(table);
         }
+        #endregion
+
+        #region Customer Delete
         public IActionResult CustomerDelete(int CustomerID)
         {
-            string connectionString = this._configuration.GetConnectionString("ConnectionString");
-            SqlConnection connection = new SqlConnection( connectionString);
-            connection.Open();
-            SqlCommand command = connection.CreateCommand();
-            command.CommandType = CommandType.StoredProcedure;
-            command.CommandText = "PR_Customer_DeleteByPK";
-            command.Parameters.Add("@CustomerID", SqlDbType.Int).Value = CustomerID;
-            command.ExecuteNonQuery();
+            try
+            {
+                string connectionString = this._configuration.GetConnectionString("ConnectionString");
+                SqlConnection connection = new SqlConnection(connectionString);
+                connection.Open();
+                SqlCommand command = connection.CreateCommand();
+                command.CommandType = CommandType.StoredProcedure;
+                command.CommandText = "PR_Customer_DeleteByPK";
+                command.Parameters.Add("@CustomerID", SqlDbType.Int).Value = CustomerID;
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                // Check if it's a foreign key constraint violation error
+                if (ex.Number == 547) // 547 is the SQL Server error code for FK violation
+                {
+                    TempData["ErrorMessage"] = "Unable to delete product as it is referenced in another table.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = ex.Message;
+                }
+                Console.WriteLine(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
             return RedirectToAction("DisplayCustomer");
         }
+        #endregion
+
+        #region Form Customer 
         public IActionResult FormCustomer(int CustomerID)
         {
             string connectionString = this._configuration.GetConnectionString("ConnectionString");
@@ -72,25 +111,29 @@ namespace Nice_Admin_1.Controllers
             CustomerModel customerModel = new CustomerModel();
             foreach (DataRow dataRow in dataTable1.Rows)
             {
+                customerModel.CustomerID = Convert.ToInt32(dataRow["CustomerID"]);
                 customerModel.CustomerName = dataRow["CustomerName"].ToString();
                 customerModel.HomeAddress = dataRow["HomeAddress"].ToString();
                 customerModel.Email = dataRow["Email"].ToString();
-                customerModel.MobileNo= dataRow["MobileNo"].ToString();
-                customerModel.GSTNO= dataRow["GSTNO"].ToString();
-                customerModel.CityName= dataRow["CityName"].ToString();
-                customerModel.PinCode= dataRow["PinCode"].ToString();
+                customerModel.MobileNo = dataRow["MobileNo"].ToString();
+                customerModel.GSTNO = dataRow["GSTNO"].ToString();
+                customerModel.CityName = dataRow["CityName"].ToString();
+                customerModel.PinCode = dataRow["PinCode"].ToString();
                 customerModel.NetAmount = Convert.ToDouble(dataRow["NetAmount"]);
                 customerModel.UserID = Convert.ToInt32(dataRow["UserID"]);
             }
             return View("FormCustomer", customerModel);
         }
+        #endregion
+
+        #region Customer Save
         public IActionResult CustomerSave(CustomerModel customerModel)
         {
             if (customerModel.UserID <= 0)
             {
                 ModelState.AddModelError("UserID", "A valid User is required.");
             }
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
                 string connectionString = this._configuration.GetConnectionString("ConnectionString");
                 SqlConnection connection = new SqlConnection(connectionString);
@@ -120,5 +163,6 @@ namespace Nice_Admin_1.Controllers
             }
             return View("FormCustomer", customerModel);
         }
+        #endregion
     }
 }

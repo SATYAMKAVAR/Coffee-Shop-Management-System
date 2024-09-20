@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Nice_Admin_1.Models
 {
@@ -11,7 +10,7 @@ namespace Nice_Admin_1.Models
         public string ProductName { get; set; }
 
         [Required(ErrorMessage = "This Field is Required")]
-        public double ProductPrice { get; set; }
+        public double? ProductPrice { get; set; }
 
         [Required(ErrorMessage = "This Field is Required")]
         public string ProductCode { get; set; }
